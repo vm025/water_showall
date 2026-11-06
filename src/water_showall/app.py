@@ -158,7 +158,7 @@ header[data-testid="stHeader"] {{ background: transparent; }}
 .st-key-fallback {{
     border:1px dashed {GOLD}; border-radius:12px; padding:.8rem; margin-top:1.2rem; background:#14110a;
 }}
-.st-key-fallback p {{ color:{GOLD}; }}
+.st-key-fallback p {{ color: white; }}
 .st-key-fallback a {{ background:{GOLD} !important; color:#000 !important; border:none !important; }}
 .foot {{ text-align:center; color:#7a7a7a; font-size:.75rem; margin-top:1.5rem; }}
 
