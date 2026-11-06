@@ -57,11 +57,19 @@ def get_sheet():
     import gspread
     from google.oauth2.service_account import Credentials
 
+    info = dict(st.secrets["gcp_service_account"])
     scopes = ["https://www.googleapis.com/auth/spreadsheets",
               "https://www.googleapis.com/auth/drive"]
-    creds = Credentials.from_service_account_info(
-        dict(st.secrets["gcp_service_account"]), scopes=scopes)
-    return gspread.authorize(creds).open(SHEET_NAME).sheet1
+    client = gspread.authorize(Credentials.from_service_account_info(info, scopes=scopes))
+    try:
+        # optional: SHEET_ID in secrets opens by ID (no Drive API needed)
+        sheet_id = st.secrets.get("SHEET_ID", "")
+        sh = client.open_by_key(sheet_id) if sheet_id else client.open(SHEET_NAME)
+    except gspread.exceptions.SpreadsheetNotFound:
+        raise RuntimeError(
+            f"Spreadsheet '{SHEET_NAME}' not found. Share it (Editor access) with "
+            f"{info.get('client_email', 'the service account')} and check the name.")
+    return sh.sheet1
 
 
 def log_visit(button_label: str) -> None:
@@ -79,7 +87,7 @@ def log_visit(button_label: str) -> None:
         ws.append_row([serial, get_ip(), ts, button_label],
                       value_input_option="USER_ENTERED")
     except Exception as e:
-        st.session_state["log_error"] = str(e)
+        st.session_state["log_error"] = f"{type(e).__name__}: {e}"
 
 
 # ----------------------------------------------------------------------------
