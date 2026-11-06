@@ -8,17 +8,17 @@ import streamlit as st
 # ----------------------------------------------------------------------------
 # Config
 # ----------------------------------------------------------------------------
-st.set_page_config(page_title="Tracking Every Drop", page_icon="💧", layout="centered")
+st.set_page_config(page_title="Tracking Every Drop", page_icon="📊", layout="centered")
 
 SHEET_NAME = "visitor2water"
 IST = ZoneInfo("Asia/Kolkata")
 HEADERS = ["Serial No", "IP Address", "Timestamp (IST)", "Button Clicked"]
 
 LINKS = {
-    "meter":    ("Water Meter Reading",   "https://xxx.streamlit.app/"),
-    "tanker":   ("Tanker Arrival",        "https://yyy.streamlit.app/"),
-    "bwssb":    ("Consumption (BWSSB)",   "https://zzz.streamlit.app/"),
-    "usage":    ("Tanker Usage",          "https://www.netlify.app/"),
+    "meter":    ("Water Meter Reading",   "https://meter-oct2026.streamlit.app/"),
+    "tanker":   ("Tanker Arrival",        "https://tanker-water-dom.streamlit.app/"),
+    "bwssb":    ("Consumption (BWSSB)",   "https://graph-2026.streamlit.app/"),
+    "usage":    ("Tanker Usage",          "https://dashboard-wtanker.netlify.app/"),
 }
 
 # LOGGING flag lives in .streamlit/secrets.toml (defaults to False if missing)
@@ -112,6 +112,18 @@ header[data-testid="stHeader"] {{ background: transparent; }}
 .sub-red  {{ color:#FF1A1A; }}
 .sub-blue {{ color:#1E90FF; }}
 
+/* keep the two buttons on one line, even on narrow phone screens */
+.st-key-panel1 [data-testid="stHorizontalBlock"],
+.st-key-panel2 [data-testid="stHorizontalBlock"] {{
+    flex-wrap:nowrap !important; gap:.6rem !important;
+}}
+.st-key-panel1 [data-testid="stColumn"],
+.st-key-panel2 [data-testid="stColumn"] {{
+    flex:1 1 0 !important; min-width:0 !important; width:auto !important;
+}}
+.stButton > button {{ min-height:4rem; line-height:1.25; }}
+.stButton > button p {{ white-space:normal; text-align:center; }}
+
 /* buttons */
 .stButton > button, .stLinkButton > a {{
     width:100%; padding:.8rem 1rem; border-radius:12px; font-weight:700;
@@ -135,6 +147,7 @@ header[data-testid="stHeader"] {{ background: transparent; }}
 @media (max-width:480px) {{
     .app-title {{ font-size:1.8rem; }}
     .panel-title {{ font-size:1.25rem; }}
+    .stButton > button {{ font-size:.9rem; padding:.6rem .4rem; }}
 }}
 </style>
 """, unsafe_allow_html=True)
@@ -160,10 +173,13 @@ with analytics_ctx:
     with st.container(key="panel1", border=True):
         st.markdown('<p class="panel-title p1">Water Resource Management</p>', unsafe_allow_html=True)
         st.markdown('<p class="sub sub-red">Only for the Security team</p>', unsafe_allow_html=True)
-        if st.button(LINKS["meter"][0], key="btn_meter"):
-            handle_click("meter")
-        if st.button(LINKS["tanker"][0], key="btn_tanker"):
-            handle_click("tanker")
+        col_a, col_b = st.columns(2, gap="small")
+        with col_a:
+            if st.button(LINKS["meter"][0], key="btn_meter"):
+                handle_click("meter")
+        with col_b:
+            if st.button(LINKS["tanker"][0], key="btn_tanker"):
+                handle_click("tanker")
 
     st.write("")
 
@@ -171,10 +187,13 @@ with analytics_ctx:
     with st.container(key="panel2", border=True):
         st.markdown('<p class="panel-title p2">Dashboard (Graph)</p>', unsafe_allow_html=True)
         st.markdown('<p class="sub sub-blue">For Other Users</p>', unsafe_allow_html=True)
-        if st.button(LINKS["bwssb"][0], key="btn_bwssb"):
-            handle_click("bwssb")
-        if st.button(LINKS["usage"][0], key="btn_usage"):
-            handle_click("usage")
+        col_a, col_b = st.columns(2, gap="small")
+        with col_a:
+            if st.button(LINKS["bwssb"][0], key="btn_bwssb"):
+                handle_click("bwssb")
+        with col_b:
+            if st.button(LINKS["usage"][0], key="btn_usage"):
+                handle_click("usage")
 
     # ---- Redirect (auto-open + guaranteed fallback link) ----
     if "pending" in st.session_state:
@@ -185,7 +204,7 @@ with analytics_ctx:
             unsafe_allow_javascript=True,
         )
         with st.container(key="fallback"):
-            st.markdown(f"✅ Visit logged. If **{label}** didn't open automatically, tap below:")
+            st.markdown(f"If **{label}** didn't open automatically, tap below:")
             st.link_button(f"Open {label} ↗", url)
 
     if LOGGING and "log_error" in st.session_state:
