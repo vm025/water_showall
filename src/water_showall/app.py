@@ -44,12 +44,22 @@ else:
 # Helpers: visitor info + Google Sheet logging
 # ----------------------------------------------------------------------------
 def get_ip() -> str:
+    """Best-effort visitor IP: proxy headers first, then the raw connection IP."""
     try:
         h = st.context.headers
-        fwd = h.get("X-Forwarded-For") or h.get("X-Real-Ip") or ""
-        return fwd.split(",")[0].strip() or "unknown"
+        for name in ("X-Forwarded-For", "X-Real-Ip", "CF-Connecting-IP", "True-Client-IP"):
+            val = (h.get(name) or "").split(",")[0].strip()
+            if val:
+                return val
     except Exception:
-        return "unknown"
+        pass
+    try:
+        ip = st.context.ip_address        # Streamlit >= 1.45; None on localhost
+        if ip:
+            return ip
+    except Exception:
+        pass
+    return "unknown"
 
 
 @st.cache_resource(show_spinner=False)
