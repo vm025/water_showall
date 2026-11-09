@@ -17,8 +17,12 @@ HEADERS = ["Serial No", "IP Address", "Timestamp (IST)", "Button Clicked"]
 LINKS = {
     "meter":    ("Water Meter Reading",   "https://meter-oct2026.streamlit.app/"),
     "tanker":   ("Tanker Arrival",        "https://tanker-water-dom.streamlit.app/"),
+    "genset":    ("Genset On / Off",      "https://genset-d131-dom.streamlit.app/"),
+
     "bwssb":    ("Consumption (BWSSB)",   "https://graph-2026.streamlit.app/"),
-    "usage":    ("Tanker Usage",          "https://dashboard-wtanker.netlify.app/"),
+    "tusage":    ("Tanker Usage",          "https://dashboard-wtanker.netlify.app/"),
+    "genuse":  ("Genset Usage",           "https://genset-d131-dashboard.streamlit.app/"),
+    
 }
 
 # LOGGING flag lives in .streamlit/secrets.toml (defaults to False if missing)
@@ -149,10 +153,10 @@ header[data-testid="stHeader"] {{ background: transparent; }}
 }}
 .stButton > button:hover, .stLinkButton > a:hover {{ transform:translateY(-2px); filter:brightness(1.12); }}
 
-.st-key-btn_meter button, .st-key-btn_tanker button {{
+.st-key-btn_meter button, .st-key-btn_tanker button, .st-key-btn_genset button {{
     background:#0B5559 !important; color:#fff !important; border:1.5px solid {GOLD} !important;
 }}
-.st-key-btn_bwssb button, .st-key-btn_usage button {{
+.st-key-btn_bwssb button, .st-key-btn_tusage button, .st-key-btn_genuse button {{
     background:#B9A2E3 !important; color:#1a1030 !important; border:1.5px solid {ORANGE} !important;
 }}
 .st-key-fallback {{
@@ -191,13 +195,16 @@ with analytics_ctx:
     with st.container(key="panel1", border=True):
         st.markdown('<p class="panel-title p1">Water Resource Management</p>', unsafe_allow_html=True)
         st.markdown('<p class="sub sub-red">Only for the Security team</p>', unsafe_allow_html=True)
-        col_a, col_b = st.columns(2, gap="small")
+        col_a, col_b, col_c = st.columns(3, gap="small")
         with col_a:
             if st.button(LINKS["meter"][0], key="btn_meter"):
                 handle_click("meter")
         with col_b:
             if st.button(LINKS["tanker"][0], key="btn_tanker"):
                 handle_click("tanker")
+        with col_c:
+            if st.button(LINKS["genset"][0], key="btn_genset"):
+                        handle_click("genset")        
 
     st.write("")
 
@@ -205,13 +212,16 @@ with analytics_ctx:
     with st.container(key="panel2", border=True):
         st.markdown('<p class="panel-title p2">Dashboard (Graph)</p>', unsafe_allow_html=True)
         st.markdown('<p class="sub sub-blue">For Other Users</p>', unsafe_allow_html=True)
-        col_a, col_b = st.columns(2, gap="small")
+        col_a, col_b, col_c = st.columns(3, gap="small")
         with col_a:
             if st.button(LINKS["bwssb"][0], key="btn_bwssb"):
                 handle_click("bwssb")
         with col_b:
-            if st.button(LINKS["usage"][0], key="btn_usage"):
-                handle_click("usage")
+            if st.button(LINKS["tusage"][0], key="btn_tusage"):
+                handle_click("tusage")
+        # with col_c:
+        #     if st.button(LINKS["genuse"][0], key="btn_genuse"):
+        #         handle_click("genuse")                
 
     # ---- Redirect (auto-open + guaranteed fallback link) ----
     if "pending" in st.session_state:
